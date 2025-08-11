@@ -1,0 +1,56 @@
+# Cloudflare Pages _headers — Security + Caching
+# Общие правила: сперва глобальные, затем более специфичные пути.
+# Примечание: правила применяются по блокам к путям, поэтому для ассетов кэш настраиваем отдельно.
+
+/*
+  # Security
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://images.unsplash.com https://pub-cdn.sider.ai https://placehold.co; connect-src 'self' https://api.open-meteo.com https://open.er-api.com https://api.exchangerate.host https://cdnjs.cloudflare.com https://cors-anywhere.herokuapp.com; font-src 'self' data:; media-src 'none'; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'; upgrade-insecure-requests
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Permissions-Policy: geolocation=(self), microphone=(), camera=(), payment=(), usb=()
+  Cross-Origin-Resource-Policy: same-origin
+
+  # HTML и SPA-роутинг — без кэша
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Хэшированные ассеты сборки (esbuild обычно кладёт сюда)
+# Долгоживущее кэширование с immutable
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# На случай, если сборка кладёт файлы в корень (резервные правила)
+# JS/CSS — кэш 1 год, immutable
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Шрифты — кэш 1 год
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+/*.ttf
+  Cache-Control: public, max-age=31536000, immutable
+/*.otf
+  Cache-Control: public, max-age=31536000, immutable
+/*.eot
+  Cache-Control: public, max-age=31536000, immutable
+
+# Изображения — кэш 7 дней (чаще обновляются)
+# При желании можно тоже сделать immutable, если используете хэш-имена.
+/*.png
+  Cache-Control: public, max-age=604800, immutable
+/*.jpg
+  Cache-Control: public, max-age=604800, immutable
+/*.jpeg
+  Cache-Control: public, max-age=604800, immutable
+/*.gif
+  Cache-Control: public, max-age=604800, immutable
+/*.svg
+  Cache-Control: public, max-age=604800, immutable
+/*.webp
+  Cache-Control: public, max-age=604800, immutable
+/*.ico
+  Cache-Control: public, max-age=604800, immutable
